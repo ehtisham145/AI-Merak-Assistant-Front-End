@@ -192,206 +192,222 @@ export default function ChatWidget() {
 
   return (
     <>
-      {/* Google Font */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@700;800&family=Cinzel:wght@700;800&display=swap');
 
-        .chat-widget * { font-family: 'DM Sans', sans-serif; }
-        .chat-widget-title { font-family: 'Syne', sans-serif; }
+        .cw * { box-sizing: border-box; }
+        .cw { font-family: 'Outfit', sans-serif; }
+        .cw-serif { font-family: 'Playfair Display', serif; }
+        .cw-title { font-family: 'Cinzel', serif; letter-spacing: 0.03em; }
 
-        .chat-bubble-in {
-          animation: bubbleIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        @keyframes bubbleIn {
-          from { opacity: 0; transform: scale(0.85) translateY(8px); }
-          to { opacity: 1; transform: scale(1) translateY(0); }
-        }
-
-        .widget-open {
-          animation: widgetOpen 0.3s cubic-bezier(0.34, 1.4, 0.64, 1);
+        /* Widget open animation */
+        .cw-open {
+          animation: cwOpen 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
           transform-origin: bottom right;
         }
-        @keyframes widgetOpen {
-          from { opacity: 0; transform: scale(0.7) translateY(20px); }
-          to { opacity: 1; transform: scale(1) translateY(0); }
+        @keyframes cwOpen {
+          from { opacity: 0; transform: scale(0.8) translateY(24px); }
+          to   { opacity: 1; transform: scale(1)   translateY(0);    }
         }
 
-        .dot-bounce { animation: dotBounce 1.2s infinite ease-in-out; }
-        .dot-bounce:nth-child(2) { animation-delay: 0.2s; }
-        .dot-bounce:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes dotBounce {
-          0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
-          40% { transform: translateY(-5px); opacity: 1; }
+        /* Bubble in */
+        .cw-bubble {
+          animation: cwBubble 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes cwBubble {
+          from { opacity: 0; transform: translateY(10px) scale(0.92); }
+          to   { opacity: 1; transform: translateY(0)    scale(1);    }
         }
 
-        .fab-pulse::after {
-          content: '';
-          position: absolute;
-          inset: -4px;
-          border-radius: 50%;
-          background: rgba(99,102,241,0.35);
-          animation: fabPulse 2s ease-out infinite;
-        }
-        @keyframes fabPulse {
-          0% { transform: scale(1); opacity: 0.8; }
-          100% { transform: scale(1.6); opacity: 0; }
+        /* Typing dots */
+        .cw-dot { animation: cwDot 1.4s infinite ease-in-out; }
+        .cw-dot:nth-child(2) { animation-delay: 0.2s; }
+        .cw-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes cwDot {
+          0%, 60%, 100% { transform: translateY(0);    opacity: 0.3; }
+          30%           { transform: translateY(-5px); opacity: 1;   }
         }
 
-        .suggestion-pill {
-          transition: all 0.18s ease;
-          border: 1.5px solid #c7d2fe;
-          background: #eef2ff;
-          color: #4338ca;
+        /* FAB ring pulse */
+        .cw-fab-ring {
+          animation: cwRing 2.5s ease-out infinite;
         }
-        .suggestion-pill:hover {
-          background: #4f46e5;
-          color: white;
-          border-color: #4f46e5;
+        @keyframes cwRing {
+          0%   { transform: scale(1);   opacity: 0.6; }
+          100% { transform: scale(1.8); opacity: 0;   }
+        }
+
+        /* Scrollbar */
+        .cw-scroll::-webkit-scrollbar { width: 4px; }
+        .cw-scroll::-webkit-scrollbar-track { background: transparent; }
+        .cw-scroll::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.25); border-radius: 99px; }
+
+        /* Input focus glow */
+        .cw-input:focus { outline: none; border-color: #818cf8 !important; box-shadow: 0 0 0 3px rgba(129,140,248,0.15); }
+
+        /* Suggestion hover */
+        .cw-chip { transition: all 0.18s ease; }
+        .cw-chip:hover {
+          background: rgba(129,140,248,0.2) !important;
+          border-color: #818cf8 !important;
+          color: #c7d2fe !important;
           transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(79,70,229,0.25);
         }
 
-        .send-btn {
-          background: linear-gradient(135deg, #4f46e5, #7c3aed);
-          transition: all 0.18s ease;
-        }
-        .send-btn:hover:not(:disabled) {
-          transform: scale(1.08);
-          box-shadow: 0 4px 14px rgba(79,70,229,0.45);
+        /* Send button */
+        .cw-send { transition: all 0.18s ease; }
+        .cw-send:hover:not(:disabled) {
+          transform: scale(1.1) rotate(5deg);
+          box-shadow: 0 6px 20px rgba(99,102,241,0.5) !important;
         }
 
-        .input-field:focus {
-          border-color: #6366f1;
-          box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+        /* Header buttons */
+        .cw-hbtn { transition: all 0.15s ease; }
+        .cw-hbtn:hover { background: rgba(255,255,255,0.15) !important; color: white !important; }
+
+        /* Bot message prose */
+        .cw-prose { font-size: 1.08rem; line-height: 1.7; }
+        .cw-prose p { margin: 0 0 0.55rem; }
+        .cw-prose p:last-child { margin: 0; }
+        .cw-prose ul { list-style: none; padding: 0; margin: 0.5rem 0; }
+        .cw-prose ul li { padding-left: 1.5rem; position: relative; margin-bottom: 0.4rem; color: #c7d2fe; font-size: 1.08rem; }
+        .cw-prose ul li::before { content: '▸'; position: absolute; left: 0; color: #818cf8; font-size: 0.9rem; top: 2px; }
+        .cw-prose ol { padding-left: 1.5rem; margin: 0.5rem 0; }
+        .cw-prose ol li { margin-bottom: 0.4rem; color: #c7d2fe; font-size: 1.08rem; }
+        .cw-prose strong { color: #e0e7ff; font-weight: 700; }
+        .cw-prose h1, .cw-prose h2 { font-family: 'Playfair Display', serif; font-weight: 700; margin: 0.9rem 0 0.35rem; color: #e0e7ff; font-size: 1.05rem; }
+        .cw-prose h3 { font-weight: 600; margin: 0.6rem 0 0.25rem; color: #a5b4fc; font-size: 0.95rem; }
+        .cw-prose code { background: rgba(99,102,241,0.2); color: #a5b4fc; padding: 0.15rem 0.45rem; border-radius: 4px; font-size: 0.85rem; border: 1px solid rgba(99,102,241,0.3); }
+
+        /* Register input focus */
+        .cw-reg-wrap:focus-within {
+          border-color: rgba(129,140,248,0.6) !important;
+          box-shadow: 0 0 0 3px rgba(129,140,248,0.1);
         }
 
-        .prose-bot p { margin-bottom: 0.4rem; }
-        .prose-bot p:last-child { margin-bottom: 0; }
-        .prose-bot ul { list-style: none; padding: 0; margin: 0.4rem 0; }
-        .prose-bot ul li { padding-left: 1.2rem; position: relative; margin-bottom: 0.25rem; }
-        .prose-bot ul li::before { content: '›'; position: absolute; left: 0; color: #6366f1; font-weight: 700; }
-        .prose-bot ol { padding-left: 1.4rem; margin: 0.4rem 0; }
-        .prose-bot ol li { margin-bottom: 0.25rem; }
-        .prose-bot strong { color: #1e1b4b; font-weight: 600; }
-        .prose-bot h1, .prose-bot h2 { font-family: 'Syne', sans-serif; font-weight: 700; margin: 0.6rem 0 0.3rem; color: #1e1b4b; font-size: 0.95rem; }
-        .prose-bot h3 { font-weight: 600; margin: 0.4rem 0 0.2rem; color: #312e81; font-size: 0.875rem; }
-        .prose-bot code { background: #e0e7ff; color: #3730a3; padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.8rem; }
+        /* Shimmer on register button */
+        @keyframes cwShimmer {
+          0%   { background-position: -200% center; }
+          100% { background-position: 200% center; }
+        }
+        .cw-reg-btn {
+          background: linear-gradient(90deg, #4f46e5, #7c3aed, #6366f1, #4f46e5);
+          background-size: 300% auto;
+          transition: all 0.2s;
+        }
+        .cw-reg-btn:hover:not(:disabled) {
+          animation: cwShimmer 1.5s linear infinite;
+          box-shadow: 0 8px 28px rgba(99,102,241,0.5) !important;
+          transform: translateY(-1px);
+        }
       `}</style>
 
-      <div className="chat-widget fixed bottom-6 right-6 z-50">
-        {/* Chat Window */}
+      <div className="cw" style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999 }}>
+
+        {/* ── Chat Window ── */}
         {isOpen && (
           <div
-            className="widget-open mb-4 flex flex-col rounded-3xl overflow-hidden bg-white"
+            className="cw-open"
             style={{
-              width: "370px",
-              height: "560px",
-              boxShadow: "0 24px 60px rgba(79,70,229,0.18), 0 4px 16px rgba(0,0,0,0.08)",
-              border: "1px solid rgba(99,102,241,0.15)",
+              marginBottom: 16,
+              width: 460,
+              height: 700,
+              display: "flex",
+              flexDirection: "column",
+              borderRadius: 24,
+              overflow: "hidden",
+              background: "linear-gradient(160deg, #0f0e1a 0%, #13111f 50%, #0d0b18 100%)",
+              border: "1px solid rgba(99,102,241,0.2)",
+              boxShadow: "0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04), inset 0 1px 0 rgba(255,255,255,0.06)",
             }}
           >
+
             {/* ── Header ── */}
-            <div
-              className="relative px-4 py-3 flex items-center gap-3 flex-shrink-0"
-              style={{
-                background: "linear-gradient(135deg, #1e1b4b 0%, #4f46e5 60%, #7c3aed 100%)",
-              }}
-            >
-              {/* Decorative circles */}
+            <div style={{
+              padding: "14px 16px",
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              background: "linear-gradient(135deg, rgba(79,70,229,0.3) 0%, rgba(124,58,237,0.2) 100%)",
+              borderBottom: "1px solid rgba(99,102,241,0.15)",
+              backdropFilter: "blur(20px)",
+              flexShrink: 0,
+              position: "relative",
+              overflow: "hidden",
+            }}>
+              {/* Decorative orb */}
               <div style={{
-                position: "absolute", top: -20, right: -20,
-                width: 80, height: 80, borderRadius: "50%",
-                background: "rgba(255,255,255,0.05)"
-              }} />
-              <div style={{
-                position: "absolute", bottom: -30, left: 60,
-                width: 60, height: 60, borderRadius: "50%",
-                background: "rgba(255,255,255,0.04)"
+                position: "absolute", top: -40, right: -20,
+                width: 120, height: 120, borderRadius: "50%",
+                background: "radial-gradient(circle, rgba(124,58,237,0.3) 0%, transparent 70%)",
+                pointerEvents: "none",
               }} />
 
+              {/* Avatar */}
               <div style={{
-                width: 40, height: 40, borderRadius: "50%",
-                background: "rgba(255,255,255,0.12)",
-                backdropFilter: "blur(8px)",
-                border: "1.5px solid rgba(255,255,255,0.2)",
+                width: 42, height: 42, borderRadius: "50%",
+                background: "linear-gradient(135deg, #4f46e5, #7c3aed)",
                 display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 18, flexShrink: 0, position: "relative", zIndex: 1
+                fontSize: 18, flexShrink: 0,
+                boxShadow: "0 0 0 2px rgba(129,140,248,0.3), 0 4px 16px rgba(79,70,229,0.4)",
+                position: "relative", zIndex: 1,
               }}>
                 🤖
               </div>
 
-              <div className="flex-1 min-w-0" style={{ position: "relative", zIndex: 1 }}>
-                <p className="chat-widget-title text-white font-bold leading-tight" style={{ fontSize: "0.95rem", letterSpacing: "-0.01em" }}>
-                  E-Numerak AI Assistant
+              {/* Title */}
+              <div style={{ flex: 1, minWidth: 0, position: "relative", zIndex: 1 }}>
+                <p className="cw-title" style={{
+                  color: "white", fontWeight: 700, fontSize: "1.05rem",
+                  margin: 0, lineHeight: 1.2,
+                }}>
+                  E-Numerak <span style={{ color: "#a5b4fc" }}>Assistant</span>
                 </p>
-                <div className="flex items-center gap-1.5 mt-0.5">
+                <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 3 }}>
                   <span style={{
-                    width: 7, height: 7, borderRadius: "50%",
-                    background: "#4ade80",
-                    boxShadow: "0 0 6px #4ade80",
-                    display: "inline-block"
+                    width: 6, height: 6, borderRadius: "50%",
+                    background: "#34d399",
+                    boxShadow: "0 0 8px #34d399",
+                    display: "inline-block", flexShrink: 0,
                   }} />
-                  <span style={{ color: "rgba(255,255,255,0.7)", fontSize: "0.7rem" }}>
-                    Online · UAE Tax Expert
+                  <span style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.68rem", letterSpacing: "0.04em" }}>
+                    UAE TAX EXPERT · ONLINE
                   </span>
                 </div>
               </div>
 
+              {/* Header actions */}
               {screen === "chat" && (
-                <div className="flex items-center gap-1.5" style={{ position: "relative", zIndex: 1 }}>
-                  <button
-                    onClick={handleNewChat}
-                    style={{
-                      color: "rgba(255,255,255,0.75)",
-                      fontSize: "0.68rem",
-                      border: "1px solid rgba(255,255,255,0.2)",
-                      borderRadius: 20,
-                      padding: "2px 10px",
-                      background: "rgba(255,255,255,0.08)",
-                      cursor: "pointer",
-                      transition: "all 0.15s",
-                    }}
-                    onMouseOver={e => (e.currentTarget.style.background = "rgba(255,255,255,0.18)")}
-                    onMouseOut={e => (e.currentTarget.style.background = "rgba(255,255,255,0.08)")}
-                  >
-                    New
+                <div style={{ display: "flex", gap: 6, position: "relative", zIndex: 1 }}>
+                  <button onClick={handleNewChat} className="cw-hbtn" style={{
+                    background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)",
+                    color: "rgba(255,255,255,0.6)", fontSize: "0.67rem", fontFamily: "'Outfit', sans-serif",
+                    fontWeight: 500, borderRadius: 20, padding: "3px 11px", cursor: "pointer",
+                    letterSpacing: "0.03em",
+                  }}>
+                    NEW
                   </button>
-                  <button
-                    onClick={handleLogout}
-                    style={{
-                      color: "rgba(255,255,255,0.75)",
-                      fontSize: "0.68rem",
-                      border: "1px solid rgba(255,255,255,0.2)",
-                      borderRadius: 20,
-                      padding: "2px 10px",
-                      background: "rgba(255,255,255,0.08)",
-                      cursor: "pointer",
-                      transition: "all 0.15s",
-                    }}
-                    onMouseOver={e => (e.currentTarget.style.background = "rgba(255,255,255,0.18)")}
-                    onMouseOut={e => (e.currentTarget.style.background = "rgba(255,255,255,0.08)")}
-                  >
-                    Exit
+                  <button onClick={handleLogout} className="cw-hbtn" style={{
+                    background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)",
+                    color: "rgba(255,255,255,0.6)", fontSize: "0.67rem", fontFamily: "'Outfit', sans-serif",
+                    fontWeight: 500, borderRadius: 20, padding: "3px 11px", cursor: "pointer",
+                    letterSpacing: "0.03em",
+                  }}>
+                    EXIT
                   </button>
                 </div>
               )}
 
-              <button
-                onClick={() => setIsOpen(false)}
-                style={{
-                  color: "rgba(255,255,255,0.6)",
-                  fontSize: 22,
-                  lineHeight: 1,
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  padding: "0 0 0 4px",
-                  position: "relative",
-                  zIndex: 1,
-                  transition: "color 0.15s",
-                }}
-                onMouseOver={e => (e.currentTarget.style.color = "white")}
-                onMouseOut={e => (e.currentTarget.style.color = "rgba(255,255,255,0.6)")}
+              {/* Close */}
+              <button onClick={() => setIsOpen(false)} style={{
+                background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)",
+                color: "rgba(255,255,255,0.5)", width: 28, height: 28, borderRadius: "50%",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 16, cursor: "pointer", flexShrink: 0,
+                transition: "all 0.15s", position: "relative", zIndex: 1,
+              }}
+                onMouseOver={e => { e.currentTarget.style.background = "rgba(255,255,255,0.14)"; e.currentTarget.style.color = "white"; }}
+                onMouseOut={e => { e.currentTarget.style.background = "rgba(255,255,255,0.06)"; e.currentTarget.style.color = "rgba(255,255,255,0.5)"; }}
               >
                 ×
               </button>
@@ -399,41 +415,53 @@ export default function ChatWidget() {
 
             {/* ── Register Screen ── */}
             {screen === "register" && (
-              <div className="flex-1 flex flex-col justify-center px-6 py-5 overflow-y-auto"
-                style={{ background: "linear-gradient(160deg, #f8f7ff 0%, #eef2ff 100%)" }}>
-                <div className="text-center mb-5">
+              <div style={{
+                flex: 1, display: "flex", flexDirection: "column",
+                justifyContent: "center", padding: "28px 24px",
+                overflowY: "auto",
+              }}>
+                {/* Hero */}
+                <div style={{ textAlign: "center", marginBottom: 28 }}>
                   <div style={{
-                    width: 60, height: 60, borderRadius: "50%",
-                    background: "linear-gradient(135deg, #4f46e5, #7c3aed)",
+                    width: 72, height: 72, borderRadius: "50%",
+                    background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)",
                     display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 26, margin: "0 auto 12px",
-                    boxShadow: "0 8px 24px rgba(79,70,229,0.3)"
+                    fontSize: 30, margin: "0 auto 16px",
+                    boxShadow: "0 0 0 8px rgba(79,70,229,0.1), 0 12px 32px rgba(79,70,229,0.4)",
+                  }}>🤖</div>
+
+                  <h2 className="cw-serif" style={{
+                    color: "white", fontSize: "1.3rem", fontWeight: 700,
+                    margin: "0 0 6px", letterSpacing: "-0.02em",
                   }}>
-                    🤖
-                  </div>
-                  <h2 className="chat-widget-title text-gray-900 font-bold" style={{ fontSize: "1.1rem", letterSpacing: "-0.02em" }}>
                     Welcome to E-Numerak
                   </h2>
-                  <p style={{ color: "#6b7280", fontSize: "0.75rem", marginTop: 4 }}>
-                    Your UAE Tax Assistant · Available 24/7
+                  <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.78rem", margin: 0, letterSpacing: "0.02em" }}>
+                    Your intelligent UAE tax companion
                   </p>
                 </div>
 
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                  {/* Name field */}
+                {/* Divider */}
+                <div style={{
+                  height: 1, background: "linear-gradient(90deg, transparent, rgba(99,102,241,0.3), transparent)",
+                  marginBottom: 24,
+                }} />
+
+                {/* Fields */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                  {/* Name */}
                   <div>
-                    <label style={{ fontSize: "0.72rem", fontWeight: 600, color: "#374151", display: "block", marginBottom: 4 }}>
-                      Full Name
-                    </label>
-                    <div style={{
+                    <label style={{
+                      fontSize: "0.7rem", fontWeight: 600, color: "rgba(255,255,255,0.4)",
+                      display: "block", marginBottom: 6, letterSpacing: "0.08em", textTransform: "uppercase",
+                    }}>Full Name</label>
+                    <div className="cw-reg-wrap" style={{
                       display: "flex", alignItems: "center",
-                      border: "1.5px solid #e0e7ff", borderRadius: 14,
-                      background: "white", padding: "9px 14px", gap: 8,
-                      transition: "border-color 0.2s",
-                    }}
-                      onFocus={() => {}}
-                    >
-                      <span style={{ fontSize: 15 }}>👤</span>
+                      border: "1px solid rgba(99,102,241,0.2)", borderRadius: 14,
+                      background: "rgba(255,255,255,0.04)", padding: "11px 16px", gap: 10,
+                      transition: "all 0.2s",
+                    }}>
+                      <span style={{ fontSize: 16, opacity: 0.6 }}>👤</span>
                       <input
                         type="text"
                         value={name}
@@ -441,25 +469,27 @@ export default function ChatWidget() {
                         onKeyDown={(e) => e.key === "Enter" && handleRegister()}
                         placeholder="Enter your full name"
                         style={{
-                          flex: 1, border: "none", outline: "none",
-                          fontSize: "0.83rem", color: "#111827",
-                          background: "transparent",
+                          flex: 1, border: "none", outline: "none", background: "transparent",
+                          fontSize: "0.85rem", color: "white",
+                          fontFamily: "'Outfit', sans-serif",
                         }}
                       />
                     </div>
                   </div>
 
-                  {/* Email field */}
+                  {/* Email */}
                   <div>
-                    <label style={{ fontSize: "0.72rem", fontWeight: 600, color: "#374151", display: "block", marginBottom: 4 }}>
-                      Email Address
-                    </label>
-                    <div style={{
+                    <label style={{
+                      fontSize: "0.7rem", fontWeight: 600, color: "rgba(255,255,255,0.4)",
+                      display: "block", marginBottom: 6, letterSpacing: "0.08em", textTransform: "uppercase",
+                    }}>Email Address</label>
+                    <div className="cw-reg-wrap" style={{
                       display: "flex", alignItems: "center",
-                      border: "1.5px solid #e0e7ff", borderRadius: 14,
-                      background: "white", padding: "9px 14px", gap: 8,
+                      border: "1px solid rgba(99,102,241,0.2)", borderRadius: 14,
+                      background: "rgba(255,255,255,0.04)", padding: "11px 16px", gap: 10,
+                      transition: "all 0.2s",
                     }}>
-                      <span style={{ fontSize: 15 }}>✉️</span>
+                      <span style={{ fontSize: 16, opacity: 0.6 }}>✉️</span>
                       <input
                         type="email"
                         value={email}
@@ -467,9 +497,9 @@ export default function ChatWidget() {
                         onKeyDown={(e) => e.key === "Enter" && handleRegister()}
                         placeholder="Enter your email"
                         style={{
-                          flex: 1, border: "none", outline: "none",
-                          fontSize: "0.83rem", color: "#111827",
-                          background: "transparent",
+                          flex: 1, border: "none", outline: "none", background: "transparent",
+                          fontSize: "0.85rem", color: "white",
+                          fontFamily: "'Outfit', sans-serif",
                         }}
                       />
                     </div>
@@ -477,9 +507,9 @@ export default function ChatWidget() {
 
                   {registerError && (
                     <div style={{
-                      background: "#fef2f2", border: "1px solid #fecaca",
-                      borderRadius: 10, padding: "7px 12px",
-                      color: "#dc2626", fontSize: "0.75rem", textAlign: "center"
+                      background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)",
+                      borderRadius: 10, padding: "8px 14px",
+                      color: "#fca5a5", fontSize: "0.75rem", textAlign: "center",
                     }}>
                       {registerError}
                     </div>
@@ -488,29 +518,28 @@ export default function ChatWidget() {
                   <button
                     onClick={handleRegister}
                     disabled={registerLoading}
+                    className="cw-reg-btn"
                     style={{
-                      background: registerLoading
-                        ? "#a5b4fc"
-                        : "linear-gradient(135deg, #4f46e5, #7c3aed)",
-                      color: "white",
-                      border: "none",
-                      borderRadius: 14,
-                      padding: "11px",
-                      fontSize: "0.85rem",
-                      fontWeight: 600,
+                      color: "white", border: "none", borderRadius: 14,
+                      padding: "13px", fontSize: "0.88rem", fontWeight: 600,
                       cursor: registerLoading ? "not-allowed" : "pointer",
                       marginTop: 4,
-                      boxShadow: registerLoading ? "none" : "0 4px 16px rgba(79,70,229,0.35)",
-                      transition: "all 0.2s",
-                      letterSpacing: "0.01em",
+                      boxShadow: "0 6px 20px rgba(79,70,229,0.4)",
+                      fontFamily: "'Outfit', sans-serif",
+                      letterSpacing: "0.02em",
+                      opacity: registerLoading ? 0.7 : 1,
                     }}
                   >
-                    {registerLoading ? "Starting..." : "Start Chatting →"}
+                    {registerLoading ? "Starting session..." : "Start Chatting →"}
                   </button>
                 </div>
 
-                <p style={{ textAlign: "center", fontSize: "0.7rem", color: "#9ca3af", marginTop: 14 }}>
-                  🔒 Your data is safe and private
+                <p style={{
+                  textAlign: "center", fontSize: "0.68rem",
+                  color: "rgba(255,255,255,0.2)", marginTop: 20,
+                  letterSpacing: "0.03em",
+                }}>
+                  🔒 End-to-end encrypted · Private & secure
                 </p>
               </div>
             )}
@@ -519,61 +548,60 @@ export default function ChatWidget() {
             {screen === "chat" && (
               <>
                 {/* Messages */}
-                <div
-                  className="flex-1 overflow-y-auto"
-                  style={{
-                    padding: "14px 12px",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 10,
-                    background: "linear-gradient(160deg, #f8f7ff 0%, #eef2ff 100%)",
-                  }}
-                >
+                <div className="cw-scroll" style={{
+                  flex: 1, overflowY: "auto",
+                  padding: "16px 14px",
+                  display: "flex", flexDirection: "column", gap: 12,
+                }}>
                   {messages.map((msg, i) => (
                     <div
                       key={i}
-                      className="chat-bubble-in"
+                      className="cw-bubble"
                       style={{
                         display: "flex",
                         justifyContent: msg.role === "user" ? "flex-end" : "flex-start",
                         alignItems: "flex-end",
-                        gap: 7,
+                        gap: 8,
                       }}
                     >
+                      {/* Bot avatar */}
                       {msg.role === "bot" && (
                         <div style={{
-                          width: 28, height: 28, borderRadius: "50%",
+                          width: 30, height: 30, borderRadius: "50%",
                           background: "linear-gradient(135deg, #4f46e5, #7c3aed)",
                           display: "flex", alignItems: "center", justifyContent: "center",
                           fontSize: 13, flexShrink: 0,
-                          boxShadow: "0 2px 8px rgba(79,70,229,0.3)"
+                          boxShadow: "0 0 0 2px rgba(129,140,248,0.2), 0 4px 12px rgba(79,70,229,0.3)",
                         }}>
                           🤖
                         </div>
                       )}
 
-                      <div
-                        style={{
-                          maxWidth: "78%",
-                          padding: "9px 13px",
-                          fontSize: "0.82rem",
-                          lineHeight: 1.55,
-                          borderRadius: msg.role === "user"
-                            ? "18px 18px 4px 18px"
-                            : "18px 18px 18px 4px",
-                          background: msg.role === "user"
-                            ? "linear-gradient(135deg, #4f46e5, #6d28d9)"
-                            : "white",
-                          color: msg.role === "user" ? "white" : "#1f2937",
-                          boxShadow: msg.role === "user"
-                            ? "0 4px 14px rgba(79,70,229,0.3)"
-                            : "0 2px 10px rgba(0,0,0,0.07)",
-                          border: msg.role === "bot" ? "1px solid rgba(99,102,241,0.1)" : "none",
-                        }}
-                      >
+                      {/* Bubble */}
+                      <div style={{
+                        maxWidth: "76%",
+                        padding: "12px 16px",
+                        fontSize: "1.08rem",
+                        lineHeight: 1.7,
+                        borderRadius: msg.role === "user"
+                          ? "18px 18px 4px 18px"
+                          : "18px 18px 18px 4px",
+                        ...(msg.role === "user" ? {
+                          background: "linear-gradient(135deg, #4f46e5, #6d28d9)",
+                          color: "rgba(255,255,255,0.92)",
+                          boxShadow: "0 4px 20px rgba(79,70,229,0.35)",
+                          border: "1px solid rgba(129,140,248,0.2)",
+                        } : {
+                          background: "rgba(255,255,255,0.05)",
+                          color: "#c7d2fe",
+                          border: "1px solid rgba(99,102,241,0.15)",
+                          boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
+                          backdropFilter: "blur(12px)",
+                        }),
+                      }}>
                         {msg.text ? (
                           msg.role === "bot" ? (
-                            <div className="prose-bot">
+                            <div className="cw-prose">
                               <ReactMarkdown
                                 components={{
                                   p: ({ children }) => <p>{children}</p>,
@@ -590,17 +618,31 @@ export default function ChatWidget() {
                                 {msg.text}
                               </ReactMarkdown>
                             </div>
-                          ) : (
-                            msg.text
-                          )
+                          ) : msg.text
                         ) : (
-                          <span style={{ display: "flex", gap: 4, alignItems: "center", height: 16 }}>
-                            <span className="dot-bounce" style={{ width: 6, height: 6, borderRadius: "50%", background: "#818cf8", display: "inline-block" }} />
-                            <span className="dot-bounce" style={{ width: 6, height: 6, borderRadius: "50%", background: "#818cf8", display: "inline-block" }} />
-                            <span className="dot-bounce" style={{ width: 6, height: 6, borderRadius: "50%", background: "#818cf8", display: "inline-block" }} />
+                          <span style={{ display: "flex", gap: 5, alignItems: "center", height: 18 }}>
+                            {[0, 1, 2].map(n => (
+                              <span key={n} className="cw-dot" style={{
+                                width: 6, height: 6, borderRadius: "50%",
+                                background: "#818cf8", display: "inline-block",
+                              }} />
+                            ))}
                           </span>
                         )}
                       </div>
+
+                      {/* User avatar */}
+                      {msg.role === "user" && (
+                        <div style={{
+                          width: 30, height: 30, borderRadius: "50%",
+                          background: "linear-gradient(135deg, #6d28d9, #4f46e5)",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          fontSize: 13, flexShrink: 0,
+                          boxShadow: "0 4px 12px rgba(79,70,229,0.3)",
+                        }}>
+                          🧑
+                        </div>
+                      )}
                     </div>
                   ))}
                   <div ref={messagesEndRef} />
@@ -609,22 +651,27 @@ export default function ChatWidget() {
                 {/* Suggestions */}
                 {messages.length <= 1 && (
                   <div style={{
-                    padding: "8px 12px",
+                    padding: "10px 14px",
                     display: "flex", gap: 6, flexWrap: "wrap",
-                    background: "white",
-                    borderTop: "1px solid #e0e7ff",
+                    borderTop: "1px solid rgba(99,102,241,0.12)",
+                    background: "rgba(0,0,0,0.15)",
                   }}>
                     {suggestions.map((s, i) => (
                       <button
                         key={i}
                         onClick={() => sendMessage(s)}
-                        className="suggestion-pill"
+                        className="cw-chip"
                         style={{
-                          fontSize: "0.7rem",
-                          padding: "5px 11px",
+                          fontSize: "0.92rem",
+                          padding: "5px 12px",
                           borderRadius: 20,
                           cursor: "pointer",
                           fontWeight: 500,
+                          fontFamily: "'Outfit', sans-serif",
+                          background: "rgba(99,102,241,0.1)",
+                          border: "1px solid rgba(99,102,241,0.25)",
+                          color: "rgba(165,180,252,0.8)",
+                          letterSpacing: "0.01em",
                         }}
                       >
                         {s}
@@ -633,12 +680,13 @@ export default function ChatWidget() {
                   </div>
                 )}
 
-                {/* Input area */}
+                {/* Input */}
                 <div style={{
-                  padding: "10px 12px",
-                  borderTop: "1px solid #e0e7ff",
-                  display: "flex", gap: 8, alignItems: "center",
-                  background: "white",
+                  padding: "12px 14px",
+                  borderTop: "1px solid rgba(99,102,241,0.12)",
+                  display: "flex", gap: 10, alignItems: "center",
+                  background: "rgba(0,0,0,0.2)",
+                  backdropFilter: "blur(10px)",
                 }}>
                   <input
                     type="text"
@@ -646,33 +694,30 @@ export default function ChatWidget() {
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && sendMessage()}
                     placeholder="Ask about VAT, invoices, TRN..."
-                    className="input-field"
+                    className="cw-input"
                     style={{
-                      flex: 1,
-                      fontSize: "0.82rem",
-                      color: "#1f2937",
-                      border: "1.5px solid #e0e7ff",
-                      borderRadius: 50,
-                      padding: "9px 16px",
-                      outline: "none",
-                      background: "#f8f7ff",
+                      flex: 1, fontSize: "0.93rem", color: "white",
+                      border: "1px solid rgba(99,102,241,0.2)",
+                      borderRadius: 50, padding: "11px 20px",
+                      background: "rgba(255,255,255,0.05)",
+                      fontFamily: "'Outfit', sans-serif",
                       transition: "all 0.2s",
                     }}
                   />
                   <button
                     onClick={() => sendMessage()}
                     disabled={loading}
-                    className="send-btn"
+                    className="cw-send"
                     style={{
-                      width: 38, height: 38,
-                      borderRadius: "50%",
-                      border: "none",
-                      color: "white",
-                      fontSize: 15,
+                      width: 40, height: 40, borderRadius: "50%", border: "none",
+                      background: loading
+                        ? "rgba(99,102,241,0.3)"
+                        : "linear-gradient(135deg, #4f46e5, #7c3aed)",
+                      color: "white", fontSize: 15,
                       cursor: loading ? "not-allowed" : "pointer",
                       display: "flex", alignItems: "center", justifyContent: "center",
                       flexShrink: 0,
-                      opacity: loading ? 0.5 : 1,
+                      boxShadow: loading ? "none" : "0 4px 16px rgba(79,70,229,0.4)",
                     }}
                   >
                     ➤
@@ -681,48 +726,51 @@ export default function ChatWidget() {
 
                 {/* Footer */}
                 <div style={{
-                  textAlign: "center",
-                  fontSize: "0.65rem",
-                  color: "#9ca3af",
-                  padding: "5px",
-                  background: "white",
-                  borderTop: "1px solid #f3f4f6",
-                  letterSpacing: "0.02em",
+                  textAlign: "center", fontSize: "0.62rem",
+                  color: "rgba(255,255,255,0.18)", padding: "6px",
+                  background: "rgba(0,0,0,0.15)",
+                  letterSpacing: "0.06em", textTransform: "uppercase",
                 }}>
-                  ⚡ Powered by <span style={{ color: "#6366f1", fontWeight: 600 }}>E-Numerak AI</span>
+                  Powered by <span style={{ color: "rgba(129,140,248,0.6)", fontWeight: 600 }}>E-Numerak AI</span>
                 </div>
               </>
             )}
           </div>
         )}
 
-        {/* ── FAB Button ── */}
-        <div style={{ position: "relative", display: "inline-block" }}>
-          {!isOpen && <div className="fab-pulse" style={{ position: "absolute", inset: 0, borderRadius: "50%", pointerEvents: "none" }} />}
+        {/* ── FAB ── */}
+        <div style={{ position: "relative", display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
+          {!isOpen && (
+            <>
+              <div className="cw-fab-ring" style={{
+                position: "absolute", inset: -6, borderRadius: "50%",
+                border: "2px solid rgba(99,102,241,0.4)", pointerEvents: "none",
+              }} />
+              <div className="cw-fab-ring" style={{
+                position: "absolute", inset: -2, borderRadius: "50%",
+                border: "1px solid rgba(99,102,241,0.2)", pointerEvents: "none",
+                animationDelay: "0.8s",
+              }} />
+            </>
+          )}
           <button
             onClick={() => setIsOpen(!isOpen)}
             style={{
-              background: "linear-gradient(135deg, #4f46e5, #7c3aed)",
-              color: "white",
-              border: "none",
-              borderRadius: "50%",
-              width: 56, height: 56,
+              background: isOpen
+                ? "linear-gradient(135deg, #374151, #1f2937)"
+                : "linear-gradient(135deg, #4f46e5, #7c3aed)",
+              color: "white", border: "none", borderRadius: "50%",
+              width: 58, height: 58,
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 22,
-              cursor: "pointer",
-              boxShadow: "0 8px 24px rgba(79,70,229,0.45)",
-              transition: "transform 0.2s, box-shadow 0.2s",
-              position: "relative",
-              zIndex: 1,
+              fontSize: isOpen ? 22 : 24, cursor: "pointer",
+              boxShadow: isOpen
+                ? "0 4px 16px rgba(0,0,0,0.4)"
+                : "0 8px 28px rgba(79,70,229,0.5), 0 0 0 1px rgba(129,140,248,0.2)",
+              transition: "all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)",
+              position: "relative", zIndex: 1,
             }}
-            onMouseOver={e => {
-              e.currentTarget.style.transform = "scale(1.1)";
-              e.currentTarget.style.boxShadow = "0 12px 32px rgba(79,70,229,0.55)";
-            }}
-            onMouseOut={e => {
-              e.currentTarget.style.transform = "scale(1)";
-              e.currentTarget.style.boxShadow = "0 8px 24px rgba(79,70,229,0.45)";
-            }}
+            onMouseOver={e => { e.currentTarget.style.transform = "scale(1.1)"; }}
+            onMouseOut={e => { e.currentTarget.style.transform = "scale(1)"; }}
           >
             {isOpen ? "×" : "💬"}
           </button>
